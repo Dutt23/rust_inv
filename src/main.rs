@@ -1,6 +1,6 @@
 // use std::error::Error;
 
-use crossterm::{terminal::{self, EnterAlternateScreen}, ExecutableCommand};
+use crossterm::{terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, ExecutableCommand, cursor::{Hide, Show}};
 use rusty_audio::Audio;
 use std::{fs, error::Error, io};
 
@@ -23,9 +23,15 @@ fn main() -> Result<(), Box<dyn Error>> {
 	// You enter another screen, and on exit you come back.
 	// This is the same thing.
 	stdout.execute(EnterAlternateScreen)?;
+	// Hide Cursor
+	stdout.execute(Hide)?;
 	
 	// cleanup
 	audio.wait();
+	// SHow cursor
+	stdout.execute(Show)?;
+	stdout.execute(LeaveAlternateScreen)?;
+	terminal::disable_raw_mode()?;
 
 	Ok(())
 }
