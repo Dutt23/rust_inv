@@ -3,9 +3,9 @@
 use crossterm::{terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, ExecutableCommand, cursor::{Hide, Show}, event};
 use rusty_audio::Audio;
 use std::{fs, error::Error, io, thread};
-use std::sync::mpsc;
+use std::sync::{mpsc, Mutex};
 use std::thread::Thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use crossterm::event::{Event, KeyCode};
 use invaders::{frame, render};
 use invaders::frame::Drawable;
@@ -53,14 +53,23 @@ fn main() -> Result<(), Box<dyn Error>> {
 	});
 	// println!("captured {data:?} by value");
 	let mut player = Player::new();
+	let mut instant = Instant::now();
 	// Game loop
 	'gameloop: loop {
+		// Per frame init
+		let delta = instant.elapsed();
+		instant = Instant::now();
 		let mut curr_frame = frame::new_frame();
 		// Input
 		while event::poll(Duration::default())? {
 			if let Event::Key(key_event) = event::read()? {
 				match key_event.code {
 					KeyCode::Left => player.move_left(),
+					KeyCode::Enter | KeyCode::Char(' ') => {
+						if player.shoot() {
+							audio.play("pew");
+						}
+					}
 					KeyCode::Right => player.move_right(),
 					KeyCode::Esc | KeyCode::Char('q') => {
 						audio.play("lose");
@@ -70,8 +79,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 				}
 			}
 		}
-
-	// 	Draw and render
+		//Updates
+		player.update(delta);
+	 // Draw and render
 		player.draw(&mut curr_frame);
 		let _ = render_tx.send(curr_frame);
 		thread::sleep(Duration::from_millis(1));
