@@ -1,14 +1,9 @@
-extern crate ticktock;
-extern crate timer;
 use std::time;
 use std::time::Duration;
 use crate::frame::{Drawable, Frame};
 use crate::timer::Timer;
-// use timer::Timer;
-// use rusty_timer::Timer;
-// use ticktock::timer::Timer;
 
-struct Shot {
+pub struct Shot {
   pub x: usize,
   pub y: usize,
   pub exploding: bool,

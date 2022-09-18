@@ -1,17 +1,20 @@
 use crate::{NUM_COLS, NUM_ROWS};
 use crate::frame::{Drawable, Frame};
+use crate::shot::Shot;
 
 pub struct Player {
   // https://stackoverflow.com/questions/29592256/whats-the-difference-between-usize-and-u32
   x: usize,
-  y: usize
+  y: usize,
+  shots: Vec<Shot>
 }
 
 impl Player {
   pub fn new() -> Self {
     Self {
       x : NUM_COLS/2,
-      y: NUM_ROWS - 1
+      y: NUM_ROWS - 1,
+      shots: Vec::new()
     }
   }
 
