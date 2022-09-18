@@ -2,9 +2,12 @@
 
 use crossterm::{terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, ExecutableCommand, cursor::{Hide, Show}, event};
 use rusty_audio::Audio;
-use std::{fs, error::Error, io};
+use std::{fs, error::Error, io, thread};
+use std::sync::mpsc;
+use std::thread::Thread;
 use std::time::Duration;
 use crossterm::event::{Event, KeyCode};
+use invaders::{frame, render};
 
 fn main() -> Result<(), Box<dyn Error>> {
 	let mut audio = Audio::new();
@@ -27,11 +30,30 @@ fn main() -> Result<(), Box<dyn Error>> {
 	stdout.execute(EnterAlternateScreen)?;
 	// Hide Cursor
 	stdout.execute(Hide)?;
-	
 
+
+	// Render loop in a seperate thread.
+	// Use crossbeam channels much easier
+	let (render_tx, render_rx) = mpsc::channel();
+	let data = vec![1, 2, 3];
+	let render_handle = thread::spawn(move || {
+		let mut last_frame = frame::new_frame();
+		let mut stdout = io::stdout();
+		render::render(&mut stdout, &last_frame, &last_frame, true);
+		// println!("captured {data:?} by value");
+		loop {
+			let curr_frame = match render_rx.recv() {
+				Ok(x) => x,
+				Err(_) => break
+			};
+			render::render(&mut stdout, &last_frame, &curr_frame, false);
+			last_frame = curr_frame;
+		}
+	});
+	// println!("captured {data:?} by value");
 	// Game loop
-
 	'gameloop: loop {
+		let curr_frame = frame::new_frame();
 		// Input
 		while event::poll(Duration::default())? {
 			if let Event::Key(key_event) = event::read()? {
@@ -44,8 +66,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 				}
 			}
 		}
+
+	// 	Draw and render
+		let _ = render_tx.send(curr_frame);
+		thread::sleep(Duration::from_millis(1));
 	}
 	// cleanup
+	drop(render_tx);
+	render_handle.join().unwrap();
 	audio.wait();
 	// SHow cursor
 	stdout.execute(Show)?;

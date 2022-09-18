@@ -8,7 +8,7 @@ use crate::frame::Frame;
 pub fn render(stdout: &mut Stdout, last_frame: &Frame, current_frame: &Frame, force: bool){
 
   if force {
-    // unwarap to crash if there is any errors.
+    // unwrap to crash if there is any errors.
     stdout.queue(SetBackgroundColor(Color::Blue)).unwrap();
     stdout.queue(Clear(ClearType::All));
     stdout.queue(SetBackgroundColor(Color::Black)).unwrap();
