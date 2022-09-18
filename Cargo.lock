@@ -279,7 +279,6 @@ version = "0.1.0"
 dependencies = [
  "crossterm",
  "rusty_audio",
- "rusty_timer",
 ]
 
 [[package]]
@@ -738,12 +737,6 @@ checksum = "4db8ef6f549f2d02c3c575b7b7c80df9fb3efb31b637dcf3d3afa5641c468dd6"
 dependencies = [
  "rodio",
 ]
-
-[[package]]
-name = "rusty_timer"
-version = "1.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a34341a8f385d11407a4bbacb9d7ef934f13e33dddc1c6990ee02ec7db6d10a"
 
 [[package]]
 name = "same-file"

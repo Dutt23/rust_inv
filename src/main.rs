@@ -42,7 +42,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 		let mut last_frame = frame::new_frame();
 		let mut stdout = io::stdout();
 		render::render(&mut stdout, &last_frame, &last_frame, true);
-		// println!("captured {data:?} by value");
 		loop {
 			let curr_frame = match render_rx.recv() {
 				Ok(x) => x,
